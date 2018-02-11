@@ -32,13 +32,13 @@ setInterval(() => {
 	Kucoin.refreshTicker()
 	Coinexchange.refreshFeeds()
 	algo();
-}, config.frequentChangeInterval * 5000)
+}, config.frequentChangeInterval * 1000)
 
 setInterval(() => {
 	Bittrex.refreshCoins()
 	// Binance.refreshCoins()
 	Coinexchange.refreshCoins()
 	Kucoin.refreshCoins()
-}, config.frequentChangeInterval * 5000)
+}, config.frequentChangeInterval * 1000)
 
 

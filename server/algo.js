@@ -79,7 +79,7 @@ module.exports = async function(){
 			bidPrices.forEach(function(finalMarket){
 				var gain = ((finalMarket.bidPrice/initialMarket.askPrice)*100) - 100
 				gain = gain.toFixed(2)
-				if(gain < 10 && gain > 1){
+				if(gain > 1){
 					console.log(`${initialMarket.exchange} to ${finalMarket.exchange} : ${gain} %`)
 				}
 			})

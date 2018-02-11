@@ -1,4 +1,4 @@
 module.exports = {
-	frequentChangeInterval: 1,
-	lessFrequentChangeInterval: 10
+	frequentChangeInterval: 20,
+	lessFrequentChangeInterval: 60
 }
