@@ -15,6 +15,7 @@ ncc.connect({
  */
 var hash = require('hashmap')
 var redis = require('./redisSetup')
+var config = require('./config')
 
 module.exports = async function(){
 	try {
@@ -66,6 +67,7 @@ module.exports = async function(){
 		}
 	})
 	allMarkets.forEach(function(market){
+		var marketLogged = false;
 		var askPrices = askHash.get(market)
 		var bidPrices = bidHash.get(market)
 		if(askPrices.length == 1 || bidPrices.length == 1){
@@ -75,13 +77,18 @@ module.exports = async function(){
 			bidPrices.forEach(function(finalMarket){
 				var gain = ((finalMarket.bidPrice/initialMarket.askPrice)*100) - 100
 				gain = gain.toFixed(2)
-				if(gain > 0){
-					console.log(`Market: ${market}`)
+				if(gain > config.opportunityThreshold){
+					if(!marketLogged){
+						console.log(`Market: ${market}`)
+					}
+					marketLogged = true;
 					console.log(`${initialMarket.exchange} to ${finalMarket.exchange} : ${gain} %`)
 					console.log(`askPrice: ${initialMarket.askPrice} -- bidPrice: ${finalMarket.bidPrice}`)
-					console.log(`\n`)
 				}
 			})
 		})
+		if(marketLogged){
+			console.log('\n')
+		}
 	})
 }
