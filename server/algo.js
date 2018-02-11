@@ -65,25 +65,23 @@ module.exports = async function(){
 			}
 		}
 	})
-	console.log(askHash.get('nuls/bnb'))
-	console.log(bidHash.get('nuls/bnb'))
-	console.log(allMarkets)
 	allMarkets.forEach(function(market){
 		var askPrices = askHash.get(market)
 		var bidPrices = bidHash.get(market)
 		if(askPrices.length == 1 || bidPrices.length == 1){
 			return;
 		}
-		console.log(`Market: ${market}`)
 		askPrices.forEach(function(initialMarket){
 			bidPrices.forEach(function(finalMarket){
 				var gain = ((finalMarket.bidPrice/initialMarket.askPrice)*100) - 100
 				gain = gain.toFixed(2)
-				if(gain > 1){
+				if(gain > 0){
+					console.log(`Market: ${market}`)
 					console.log(`${initialMarket.exchange} to ${finalMarket.exchange} : ${gain} %`)
+					console.log(`askPrice: ${initialMarket.askPrice} -- bidPrice: ${finalMarket.bidPrice}`)
+					console.log(`\n`)
 				}
 			})
 		})
-		console.log(`\n\n`)
 	})
 }
