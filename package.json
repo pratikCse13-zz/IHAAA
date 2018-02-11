@@ -7,8 +7,11 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon index.js --exec babel-node --presets es2016,stage-2",
     "clean": "rm -rf compiled",
+    "clean-win": "del compiled",
     "build-prod": "npm run clean && mkdir compiled && babel server -s -d compiled",
-    "start-prod": "npm run build-prod && node bin/production"
+    "build-prod-win": "npm run clean-win && mkdir compiled && babel server -s -d compiled",
+    "start-prod": "npm run build-prod && node bin/production",
+    "start-prod-win": "npm run build-prod-win && node bin/production"
   },
   "author": "pratik|jb",
   "license": "ISC",
