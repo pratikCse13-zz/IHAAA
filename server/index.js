@@ -10,9 +10,6 @@ var miner = require('./miner.js')
 
 var app = express();
 
-var redis = require('redis');
-var redisClient = redis.createClient();
-
 miner();
 require('./marketsRefresher.js');
 

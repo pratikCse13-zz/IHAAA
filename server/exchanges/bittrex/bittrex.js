@@ -9,70 +9,67 @@ var fs = require('fs')
 /**
  * import package modules
  */
-var Exchange = require('../exchange')
+var ExchangeType1 = require('../../exchangeTypes/exchangeType1.js')
 var Feed = require('../../feed')
 var helpers = require('../../helpers')
+var constants = require('../../constants')
+var redis = require('../../redisSetup')
+var redisKeyPersist = require('../redisKeyPersistanceSetup')
+var coinPersist = require('../coinInfoPersistanceSetup')
 
-class Bittrex extends Exchange{
+class Bittrex extends ExchangeType1{
 	constructor(){
-		super();
-	};
+		super()
+		
+		this.exchange = 'bittrex'
+		this.filePath = __dirname
+		this.redisKeyPersist = redisKeyPersist(constants.STRINGS.bittrex)
+		this.coinPersist = coinPersist(constants.STRINGS.bittrex)
+		this.txMakerFee = 0.0025
+		this.txTakerFee = 0.0025
+		this.depositFee = 0
 
-	//private variables
-	marketsApi = 'https://bittrex.com/api/v1.1/public/getmarkets';
-	marketSummariesApi = 'https://bittrex.com/api/v1.1/public/getmarketsummaries';
-	currenciesApi = 'https://bittrex.com/api/v1.1/public/getcurrencies';
-	makerTxnFee = 0.0025;
-	takerTxnFee = 0.0025;
+		this.marketField = 'MarketName'
+		this.marketCoinField = 'MarketCurrency'
+		this.marketCoinLongField = 'MarketCurrencyLong'
+		this.baseCoinField = 'BaseCurrency'
+		this.baseCoinLongField = 'BaseCurrencyLong'
+		this.marketIsActiveField = 'IsActive'
+		this.api1ResultSubKey = 'result'
+		this.marketsApi = 'https://bittrex.com/api/v1.1/public/getmarkets'
+
+		this.dollarVolumeField = 'Volume'
+		this.lastPriceField = 'Last'
+		this.btcVolumeField = 'BaseVolume'
+		this.bidPriceField = 'Bid'
+		this.askPriceField = 'Ask'
+		this.api2ResultSubKey = 'result'
+		this.marketSummariesApi = 'https://bittrex.com/api/v1.1/public/getmarketsummaries'
+		
+		this.marketCoinApi2Field = 'Currency'
+		this.withdrawFeeField = 'TxFee'
+		this.coinWithdrawActiveField = 'IsActive'
+		this.coinDepositActiveField = 'IsActive'
+		this.noticeField = 'Notice'
+		this.api3ResultSubKey = 'result'
+		this.coinsApi = 'https://bittrex.com/api/v1.1/public/getcurrencies'
+	}
 
 	getMarkets(){
-		return reload('markets.json');
-	}
-
-	getMarketsApi(){
-		return this.marketsApi;
-	}
-
-	getMarketSummariesApi(){
-		return this.marketSummariesApi;
-	}
-
-	getCurrenciesApi(){
-		return this.currenciesApi;
+		return reload('markets.json')
 	}
 
 	async refreshMarkets(){
-		console.log('Refreshing Bittrex markets.')
-		var options = {
-			uri: this.getMarketsApi(),
-			json: true // Automatically parses the JSON string in the response
-		};
-		try {
-			var markets = await request.get(options);
-		} catch(err) {
-			helpers.handleError(err, 'fetching markets', 'Bittrex');
-		}
-		markets = markets.result;
-		fs.writeFileSync(__dirname+'/markets.json', JSON.stringify(markets, null, 4));
-		console.log('Bittrex markets refreshed.')		
-	};
+		super.refreshMarkets.call(this)
+	}
 
-	async refreshFeed(){
-		console.log('Refreshing Bittrex feed.')
-		var options = {
-			uri: this.getMarketSummariesApi(),
-			json: true // Automatically parses the JSON string in the response
-		};
-		try {
-			var marketSummaries = await request.get(options);
-		} catch(err) {
-			helpers.handleError(err, 'fetching markets summaries', 'Bittrex');
-		}
-		marketSummaries = marketSummaries.result;
-		fs.writeFileSync(__dirname+'/markets.json', JSON.stringify(markets, null, 4));
-		var newFeed = new Feed('bittrex', markets.marketCurrency, markets.baseCurrency);	
-		console.log('Bittrex feeds refreshed.')		
-	};
+	async refreshFeeds(){
+		super.refreshFeeds.call(this)
+	}
+
+	async refreshCoins(){
+		super.refreshCoins.call(this)
+	}
 }
 
-module.exports = Bittrex;
+module.exports = Bittrex
