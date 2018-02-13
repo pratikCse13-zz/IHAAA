@@ -27,6 +27,7 @@
     "bluebird": "^3.5.1",
     "body-parser": "^1.18.2",
     "console.io-client": "0.0.4",
+    "dateformat": "^3.0.3",
     "express": "^4.16.2",
     "hashmap": "^2.3.0",
     "moment": "^2.20.1",

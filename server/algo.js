@@ -3,6 +3,7 @@
  */
 var bluebird = require('bluebird')
 var ncc = require('console.io-client');
+var dateFormat = require('dateFormat')
 
 ncc.connect({
 	endpoint: "http://localhost:8080",
@@ -43,12 +44,14 @@ module.exports = async function(){
 			if(askArray){
 				askArray.push({
 					exchange: market.exchange,
-					askPrice: market.askPrice
+					askPrice: market.askPrice,
+					timestamp: dateFormat(market.timestamp, "longTime")
 				})
 			} else {
 				askHash.set(market.market, [{
 					exchange: market.exchange,
-					askPrice: market.askPrice
+					askPrice: market.askPrice,
+					timestamp: dateFormat(market.timestamp, "longTime")
 				}])
 			}
 			//push bid price to ask hash
@@ -56,12 +59,14 @@ module.exports = async function(){
 			if(bidArray){
 				bidArray.push({
 					exchange: market.exchange,
-					bidPrice: market.bidPrice
+					bidPrice: market.bidPrice,
+					timestamp: dateFormat(market.timestamp, "longTime")
 				})
 			} else {
 				bidHash.set(market.market, [{
 					exchange: market.exchange,
-					bidPrice: market.bidPrice
+					bidPrice: market.bidPrice,
+					timestamp: dateFormat(market.timestamp, "longTime")
 				}])
 			}
 		}
@@ -82,7 +87,7 @@ module.exports = async function(){
 						console.log(`Market: ${market}`)
 					}
 					marketLogged = true;
-					console.log(`${initialMarket.exchange} to ${finalMarket.exchange} : ${gain} %`)
+					console.log(`${initialMarket.exchange}(${initialMarket.timestamp}) to ${finalMarket.exchange}(${finalMarket.timestamp}) : ${gain} %`)
 					console.log(`askPrice: ${initialMarket.askPrice} -- bidPrice: ${finalMarket.bidPrice}`)
 				}
 			})
