@@ -45,13 +45,13 @@ module.exports = async function(){
 				askArray.push({
 					exchange: market.exchange,
 					askPrice: market.askPrice,
-					timestamp: dateFormat(market.timestamp, "longTime")
+					timestamp: dateFormat(market.timestamp, "longTime").split(' ')[0]
 				})
 			} else {
 				askHash.set(market.market, [{
 					exchange: market.exchange,
 					askPrice: market.askPrice,
-					timestamp: dateFormat(market.timestamp, "longTime")
+					timestamp: dateFormat(market.timestamp, "longTime").split(' ')[0]
 				}])
 			}
 			//push bid price to ask hash
@@ -60,13 +60,13 @@ module.exports = async function(){
 				bidArray.push({
 					exchange: market.exchange,
 					bidPrice: market.bidPrice,
-					timestamp: dateFormat(market.timestamp, "longTime")
+					timestamp: dateFormat(market.timestamp, "longTime").split(' ')[0]
 				})
 			} else {
 				bidHash.set(market.market, [{
 					exchange: market.exchange,
 					bidPrice: market.bidPrice,
-					timestamp: dateFormat(market.timestamp, "longTime")
+					timestamp: dateFormat(market.timestamp, "longTime").split(' ')[0]
 				}])
 			}
 		}
@@ -84,10 +84,10 @@ module.exports = async function(){
 				gain = gain.toFixed(2)
 				if(gain > config.opportunityThreshold){
 					if(!marketLogged){
-						console.log(`Market: ${market}`)
+						console.log(`Market: ${market} | (${finalMarket.timestamp})`)
 					}
 					marketLogged = true;
-					console.log(`${initialMarket.exchange}(${initialMarket.timestamp}) to ${finalMarket.exchange}(${finalMarket.timestamp}) : ${gain} %`)
+					console.log(`${initialMarket.exchange} to ${finalMarket.exchange} : ${gain} %`)
 					console.log(`askPrice: ${initialMarket.askPrice} -- bidPrice: ${finalMarket.bidPrice}`)
 				}
 			})
