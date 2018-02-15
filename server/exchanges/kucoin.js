@@ -9,12 +9,12 @@ var fs = require('fs')
 /**
  * import package modules
  */
-var ExchangeType2 = require('../../exchangeTypes/exchangeType2.js')
-var Feed = require('../../feed')
-var helpers = require('../../helpers')
-var constants = require('../../constants')
-var redis = require('../../redisSetup')
-var coinPersist = require('../coinInfoPersistanceSetup')
+var ExchangeType2 = require('../exchangeTypes/exchangeType2.js')
+var Feed = require('../feed')
+var helpers = require('../helpers')
+var constants = require('../constants')
+var redis = require('../redisSetup')
+var coinPersist = require('./coinInfoPersistanceSetup')
 
 class Kucoin extends ExchangeType2{
 	constructor(){

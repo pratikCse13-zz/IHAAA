@@ -9,13 +9,13 @@ var fs = require('fs')
 /**
  * import package modules
  */
-var ExchangeType1 = require('../../exchangeTypes/exchangeType1.js')
-var Feed = require('../../feed')
-var helpers = require('../../helpers')
-var constants = require('../../constants')
-var redis = require('../../redisSetup')
-var redisKeyPersist = require('../redisKeyPersistanceSetup')
-var coinPersist = require('../coinInfoPersistanceSetup')
+var ExchangeType1 = require('../exchangeTypes/exchangeType1.js')
+var Feed = require('../feed')
+var helpers = require('../helpers')
+var constants = require('../constants')
+var redis = require('../redisSetup')
+var redisKeyPersist = require('./redisKeyPersistanceSetup')
+var coinPersist = require('./coinInfoPersistanceSetup')
 
 class Coinexchange extends ExchangeType1{
 	constructor(){

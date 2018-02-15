@@ -36,6 +36,7 @@
     "redis": "^2.8.0",
     "request": "^2.83.0",
     "request-promise": "^4.2.2",
+    "require-directory": "^2.1.1",
     "require-reload": "^0.2.2",
     "socket.io": "^2.0.4",
     "socket.io-redis": "^5.2.0"

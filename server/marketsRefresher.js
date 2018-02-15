@@ -25,12 +25,16 @@ var Bittrex = new Exchanges.bittrex
 var Binance = new Exchanges.binance
 var Kucoin = new Exchanges.kucoin
 var Coinexchange = new Exchanges.coinExchange
+var Quoinex = new Exchanges.quoinex
+var Qryptos = new Exchanges.qryptos
 
 setInterval(() => {
 	Bittrex.refreshFeeds()
 	Binance.refreshFeeds()
 	Kucoin.refreshTicker()
 	Coinexchange.refreshFeeds()
+	Quoinex.refreshMarkets()
+	Qryptos.refreshMarkets()
 	algo();
 }, config.frequentChangeInterval * 1000)
 

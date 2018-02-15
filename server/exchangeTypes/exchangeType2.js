@@ -31,7 +31,7 @@ class ExchangeType2{
 			return helpers.handleError(err, 'fetching markets', `${this.exchange}`)
 		}
 		//save the markets to the json file
-		console.log(fs.writeFileSync(this.filePath+'/markets.json', JSON.stringify(markets, null, 4)))
+		console.log(fs.writeFileSync(this.filePath+`/${this.exchange}-markets.json`, JSON.stringify(markets, null, 4)))
 
 		markets.forEach(function marketIterator(market){
 			//get the market name from market currency and base currency
@@ -136,4 +136,4 @@ class ExchangeType2{
 	}
 }
 
-module.exports = ExchangeType2;
+module.exports = ExchangeType2
