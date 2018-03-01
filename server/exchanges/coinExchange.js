@@ -50,8 +50,15 @@ class Coinexchange extends ExchangeType1{
 		this.coinDepositActiveField = 'WalletStatus'
 		this.noticeField = 'Notice'
 		this.api3ResultSubKey = 'result'
+		this.parameterField = 'MarketID'
 		this.coinsApi = 'https://www.coinexchange.io/api/v1/getcurrencies'
 		
+		this.buyKey = 'result.BuyOrders'
+		this.sellKey = 'result.SellOrders'
+		this.quantityKey = 'Quantity'
+		this.rateKey = 'Price'
+		this.orderBookApi = 'https://www.coinexchange.io/api/v1/getorderbook?market_id=||'
+
 		//not available
 		this.dollarVolumeField = 'Volume'
 		this.withdrawFeeField = 'TxFee'

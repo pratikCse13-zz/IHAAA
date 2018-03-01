@@ -1,5 +1,5 @@
 module.exports = {
-	frequentChangeInterval: 20,
+	frequentChangeInterval: 10,
 	lessFrequentChangeInterval: 60,
 	opportunityThreshold: 1
 }

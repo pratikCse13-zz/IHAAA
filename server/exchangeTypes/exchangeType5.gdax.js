@@ -13,7 +13,11 @@ var redis = require('../redisSetup');
 var helpers = require('../helpers')
 var constants = require('../constants')
 
-class ExchangeType1{
+/** 
+ * this exchange type has first API providing the markets/products
+ * the nwe take the id from these markets and call the second api to get all the prices
+*/
+class ExchangeType5{
 	constructor(){}
 
 	async refreshMarkets(){
@@ -33,25 +37,45 @@ class ExchangeType1{
 			return helpers.handleError(err, 'fetching markets', `${this.exchange}`)
 		}
 		//save the markets to the json file
-		fs.writeFileSync(this.filePath+`/${this.exchange}-markets.json`, JSON.stringify(markets, null, 4))
+		// fs.writeFileSync(this.filePath+'/markets.json', JSON.stringify(markets, null, 4))
 
 		markets.forEach(market => {
 			//get the market name from market currency and base currency
 			var marketName = helpers.getMarketName(market[this.marketCoinField], market[this.baseCoinField])
 			//generate the generalised redis key based on exchange and market name
 			var key = helpers.getRedisKeyForMarketFeed(this.exchange, marketName)
-			//persist the redis key against the unprocessed market name of the APi feed.
-			//this unprocessed market name acts as the primary key across different APIs of the exchange
-			this.redisKeyPersist.setItemSync(market[this.marketField], key)
 			//get the formatted information from the API results
 			var marketCoin = helpers.getMarketCurrency(market[this.marketCoinField])
 			var baseCoin = helpers.getBaseCurrency(market[this.baseCoinField])
+			var marketCoinLong = helpers.getMarketCurrency(market[this.marketCoinLongField])
+			var baseCoinLong = helpers.getBaseCurrency(market[this.baseCoinLongField])
+
+			var bidPrice = helpers.getFormattedPrice(market[this.bidPriceField])
+			var askPrice = helpers.getFormattedPrice(market[this.askPriceField])
+			var lastPrice = helpers.getFormattedPrice(market[this.lastPriceField])
+
+			var btcVolume
+			if(baseCoin == constants.STRINGS.bitcoinShortNotation) {
+				btcVolume = helpers.getFormattedVolume(market[this.btcVolumeField])
+			} else {
+				btcVolume = helpers.getBtcVolume(market[this.btcVolumeField], baseCoin, this.exchange)
+			}
+			var dollarVolume = helpers.getDollarVolume(btcVolume)
 
 			//add the new base coin to the array of basecoins for this exchange
 			helpers.recordNewBaseCoin(this.exchange, baseCoin)
 
-			var marketCoinLong = helpers.getMarketCurrencyLong(market[this.marketCoinLongField])
-			var baseCoinLong = helpers.getBaseCurrencyLong(market[this.baseCoinLongField])
+			//if this marketCoin has a market in this exchange then save the last price of its btc market
+			if(key){
+				var marketName = key.split('|')[1]
+				var temp = marketName.split('/')
+				var marketCoin = temp[0]
+				var baseCoin = temp[1]
+				if(global[this.exchange+'BaseCoins'].indexOf(marketCoin) != -1 && baseCoin == constants.STRINGS.bitcoinShortNotation){
+					global[this.exchange+'-'+marketCoin] = lastPrice
+				}
+			}
+
 			//set the market related info to redis
 			redis.hmset(key, 
 				'exchange', this.exchange,
@@ -60,82 +84,17 @@ class ExchangeType1{
 				'marketCoinLong', marketCoinLong, 
 				'baseCoinLong', baseCoinLong,
 				'market', marketName,
-				'buyKey', this.buyKey,
-				'sellKey', this.sellKey,
-				'quantityKey', this.quantityKey,
-				'rateKey', this.rateKey,
-				'parameterField', this.parameterField,
-				'orderBookApi', this.orderBookApi.replace(/\|\|/g, market[this.parameterField]),
-				'marketIsActive', helpers.getMarketIsActive(market[this.marketIsActiveField])
-			)
-		})
-		console.timeEnd(`${this.exchange}'s Markets`)
-		console.log(`${this.exchange}'s markets refreshed.`)		
-	}
-
-	async refreshFeeds(){
-		console.log(`Refreshing ${this.exchange}'s feeds.`)
-		console.time(`${this.exchange}'s Feeds`);
-		//refresh markets first 
-		this.refreshMarkets();
-		//options to make the API call
-		var options = {
-			uri: this.marketSummariesApi,
-			json: true // Automatically parses the JSON string in the response
-		}
-		//make the API call
-		try {
-			var marketSummaries = await request.get(options)
-			if(this.api2ResultSubKey != ''){
-				marketSummaries = marketSummaries[this.api2ResultSubKey]
-			}
-		} catch(err) {
-			helpers.handleError(err, 'fetching market summaries', `${this.exchange}`)
-		}
-		
-		marketSummaries.forEach(function marketSummariesIterator(market){
-			//get the redis key(created from exchange-name and market-name) from persisted key storage 
-			//stored against the unprocessed market name in the feeds
-			var redisKey = this.redisKeyPersist.getItemSync(market[this.marketField])
-
-			//format data that needs to be saved
-			// var dollarVolume = helpers.getFormattedVolume(market[this.dollarVolumeField])
-			var lastPrice = helpers.getFormattedPrice(market[this.lastPriceField])
-			// var btcVolume = helpers.getFormattedVolume(market[this.btcVolumeField])
-			var bidPrice = helpers.getFormattedPrice(market[this.bidPriceField])
-			var askPrice = helpers.getFormattedPrice(market[this.askPriceField])
-
-			//if this marketCoin has a market in this exchange then save the last price of its btc market
-			if(redisKey){
-				var marketName = redisKey.split('|')[1]
-				var temp = marketName.split('/')
-				var marketCoin = temp[0]
-				var baseCoin = temp[1]
-				if(global[this.exchange+'BaseCoins'].indexOf(marketCoin) != -1 && baseCoin == constants.STRINGS.bitcoinShortNotation){
-					global[this.exchange+'-'+marketCoin] = lastPrice
-				}
-
-				var btcVolume
-				if(baseCoin == constants.STRINGS.bitcoinShortNotation) {
-					btcVolume = helpers.getFormattedVolume(market[this.btcVolumeField])
-				} else {
-					btcVolume = helpers.getBtcVolume(market[this.btcVolumeField], baseCoin, this.exchange)
-				}
-				var dollarVolume = helpers.getDollarVolume(btcVolume)
-			}
-
-			//set the market summaries into redis
-			redis.hmset(redisKey, 
 				'dollarVolume', dollarVolume, 
 				'lastPrice', lastPrice, 
 				'btcVolume', btcVolume, 
 				'bidPrice', bidPrice,
 				'askPrice', askPrice,
-				'timestamp', helpers.getTimestamp()
+				'timestamp', helpers.getTimestamp(),
+				'marketIsActive', helpers.getMarketIsActive(market[this.marketIsActiveField])
 			)
-		}.bind(this))
-		console.timeEnd(`${this.exchange}'s Feeds`)
-		console.log(`${this.exchange}'s feeds refreshed.`)		
+		})
+		console.timeEnd(`${this.exchange}'s Markets`)
+		console.log(`${this.exchange}'s markets refreshed.`)		
 	}
 
 	async refreshCoins(){
@@ -180,4 +139,4 @@ class ExchangeType1{
 	}
 }
 
-module.exports = ExchangeType1
+module.exports = ExchangeType5

@@ -2,8 +2,10 @@
  * import npm modules
  */
 var bluebird = require('bluebird')
-var ncc = require('console.io-client');
+var ncc = require('console.io-client')
+require('babel-polyfill')
 var dateFormat = require('dateFormat')
+var childProcess = require('child_process')
 
 ncc.connect({
 	endpoint: "http://localhost:8080",
@@ -41,33 +43,30 @@ module.exports = async function(){
 		if(market.marketIsActive){
 			//push ask price to ask hash
 			var askArray = askHash.get(market.market)
+			// if(askArray){
+			// 	askArray.push({
+			// 		exchange: market.exchange,
+			// 		askPrice: market.askPrice,
+			// 		timestamp: dateFormat(market.timestamp, "longTime").split(' ')[0]
+			// 	})
+			// } else {
+			// 	askHash.set(market.market, [{
+			// 		exchange: market.exchange,
+			// 		askPrice: market.askPrice,
+			// 		timestamp: dateFormat(market.timestamp, "longTime").split(' ')[0]
+			// 	}])
+			// }
 			if(askArray){
-				askArray.push({
-					exchange: market.exchange,
-					askPrice: market.askPrice,
-					timestamp: dateFormat(market.timestamp, "longTime").split(' ')[0]
-				})
+				askArray.push(market)
 			} else {
-				askHash.set(market.market, [{
-					exchange: market.exchange,
-					askPrice: market.askPrice,
-					timestamp: dateFormat(market.timestamp, "longTime").split(' ')[0]
-				}])
+				askHash.set(market.market, [market])
 			}
 			//push bid price to ask hash
 			var bidArray = bidHash.get(market.market)
 			if(bidArray){
-				bidArray.push({
-					exchange: market.exchange,
-					bidPrice: market.bidPrice,
-					timestamp: dateFormat(market.timestamp, "longTime").split(' ')[0]
-				})
+				bidArray.push(market)
 			} else {
-				bidHash.set(market.market, [{
-					exchange: market.exchange,
-					bidPrice: market.bidPrice,
-					timestamp: dateFormat(market.timestamp, "longTime").split(' ')[0]
-				}])
+				bidHash.set(market.market, [market])
 			}
 		}
 	})
@@ -80,15 +79,22 @@ module.exports = async function(){
 		}
 		askPrices.forEach(function(initialMarket){
 			bidPrices.forEach(function(finalMarket){
-				var gain = ((finalMarket.bidPrice/initialMarket.askPrice)*100) - 100
+				var askPrice = parseFloat(initialMarket.askPrice)
+				var bidPrice = parseFloat(finalMarket.bidPrice)
+				var gain = ((bidPrice-askPrice)/askPrice)*100
 				gain = gain.toFixed(2)
-				if(gain > config.opportunityThreshold){
-					if(!marketLogged){
-						console.log(`Market: ${market} | (${finalMarket.timestamp})`)
-					}
-					marketLogged = true;
-					console.log(`${initialMarket.exchange} to ${finalMarket.exchange} : ${gain} %`)
-					console.log(`askPrice: ${initialMarket.askPrice} -- bidPrice: ${finalMarket.bidPrice}`)
+				if(gain > 0){
+					// if(!marketLogged){
+					// 	console.log(`Market: ${market} | (${finalMarket.timestamp})`)
+					// }
+					// marketLogged = true;
+					// console.log(`${initialMarket.exchange} to ${finalMarket.exchange} : ${gain} %`)
+					// console.log(`askPrice: ${initialMarket.askPrice} -- bidPrice: ${finalMarket.bidPrice}`)
+					var worker = childProcess.fork('./compiled/depthCalculator')
+					worker.send({
+						initialMarket: initialMarket,
+						finalMarket: finalMarket
+					})
 				}
 			})
 		})

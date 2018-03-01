@@ -85,7 +85,13 @@ class ExchangeType2{
 				'lastPrice', lastPrice, 	
 				'dollarVolume', dollarVolume, 
 				'btcVolume', btcVolume, 		
-				'timestamp', helpers.getTimestamp(),	
+				'timestamp', helpers.getTimestamp(),
+				'buyKey', this.buyKey,
+				'sellKey', this.sellKey,
+				'quantityKey', this.quantityKey,
+				'rateKey', this.rateKey,
+				'parameterField', this.parameterField,
+				'orderBookApi', this.orderBookApi.replace(/\|\|/g, market[this.parameterField]),
 				'marketIsActive', helpers.getMarketIsActive(market[this.marketIsActiveField])
 			)
 		}.bind(this))

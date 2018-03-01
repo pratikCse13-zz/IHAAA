@@ -51,6 +51,13 @@ class Binance extends ExchangeType1{
 		this.api3ResultSubKey = ''
 		this.coinsApi = 'https://www.binance.com/wapi/v3/systemStatus.html'
 		
+		this.buyKey = 'bids'
+		this.sellKey = 'asks'
+		this.quantityKey = '1'
+		this.rateKey = '0'
+		this.parameterKey = ''
+		this.orderBookApi = 'https://www.binance.com/api/v1/depth?symbol=||&limit=20'
+
 		//not available
 		this.withdrawFeeField = 'TxFee'
 		this.marketCoinLongField = 'baseAsset'

@@ -53,6 +53,13 @@ class Bittrex extends ExchangeType1{
 		this.noticeField = 'Notice'
 		this.api3ResultSubKey = 'result'
 		this.coinsApi = 'https://bittrex.com/api/v1.1/public/getcurrencies'
+	
+		this.buyKey = 'result.buy'
+		this.sellKey = 'result.sell'
+		this.quantityKey = 'Quantity'
+		this.rateKey = 'Rate'
+		this.parameterField = 'MarketName'
+		this.orderBookApi = 'https://bittrex.com/api/v1.1/public/getorderbook?market=||&type=both'
 	}
 
 	getMarkets(){

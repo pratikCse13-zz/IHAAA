@@ -13,7 +13,7 @@ var redis = require('../redisSetup');
 var helpers = require('../helpers')
 var constants = require('../constants')
 
-class ExchangeType1{
+class ExchangeType4{
 	constructor(){}
 
 	async refreshMarkets(){
@@ -60,12 +60,6 @@ class ExchangeType1{
 				'marketCoinLong', marketCoinLong, 
 				'baseCoinLong', baseCoinLong,
 				'market', marketName,
-				'buyKey', this.buyKey,
-				'sellKey', this.sellKey,
-				'quantityKey', this.quantityKey,
-				'rateKey', this.rateKey,
-				'parameterField', this.parameterField,
-				'orderBookApi', this.orderBookApi.replace(/\|\|/g, market[this.parameterField]),
 				'marketIsActive', helpers.getMarketIsActive(market[this.marketIsActiveField])
 			)
 		})
@@ -180,4 +174,4 @@ class ExchangeType1{
 	}
 }
 
-module.exports = ExchangeType1
+module.exports = ExchangeType4

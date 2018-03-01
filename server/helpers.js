@@ -73,6 +73,23 @@ exports.updateBitcoinValue = async function(){
 	// fs.writeFileSync(__dirname+'/dynamo.js', JSON.stringify(dynamo, null, 4))
 }
 
+exports.updateCoinDollarValue = async function(){
+	var options = {
+		uri: constants.dollarValueApi,
+		json: true // Automatically parses the JSON string in the response
+	}
+	try {
+		var stats = await request.get(options)
+	} catch(err) {
+		console.log('Error in extracting the value of coins in dollars from coinMarketCap.')
+		console.log(err)
+	}
+	stats.forEach((stat)=>{
+		redis.set(stat.symbol.toLowerCase(), stat.price_usd)	
+	})
+	// fs.writeFileSync(__dirname+'/dynamo.js', JSON.stringify(dynamo, null, 4))
+}
+
 exports.handleError = (err, task, exchange) => {
 	console.log(`Error in $task for exchange: $exchange`)
 	console.log(err)

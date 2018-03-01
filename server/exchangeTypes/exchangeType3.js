@@ -18,7 +18,7 @@ class ExchangeType3{
 
 	async refreshMarkets(){
 		console.log(`Refreshing ${this.exchange}'s markets.`)
-		console.time(`${this.exchange}'s Markets`);
+		console.time(`${this.exchange}'s Markets`)
 		//options to make API call to get market details
 		var options = {
 			uri: this.marketsApi,
@@ -85,6 +85,12 @@ class ExchangeType3{
 				'btcVolume', btcVolume, 
 				'bidPrice', bidPrice,
 				'askPrice', askPrice,
+				'buyKey', this.buyKey,
+				'sellKey', this.sellKey,
+				'quantityKey', this.quantityKey,
+				'rateKey', this.rateKey,
+				'parameterField', this.parameterField,
+				'orderBookApi', this.orderBookApi.replace(/\|\|/g, market[this.parameterField]),
 				'timestamp', helpers.getTimestamp(),
 				'marketIsActive', helpers.getMarketIsActive(market[this.marketIsActiveField])
 			)

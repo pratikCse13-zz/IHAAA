@@ -47,7 +47,14 @@ class Kucoin extends ExchangeType2{
 		this.coinWithdrawActiveField = 'enableWithdraw'
 		this.coinDepositActiveField = 'enableDeposit'
 		this.coinsApi = 'https://api.kucoin.com/v1/market/open/coins'
-		
+	
+		this.buyKey = 'data.BUY'
+		this.sellKey = 'data.SELL'
+		this.quantityKey = '1'
+		this.rateKey = '0'
+		this.parameterField = 'symbol'
+		this.orderBookApi = 'https://api.kucoin.com/v1/||/open/orders?limit=20'
+
 		//not available
 		this.dollarVolumeField = 'Volume';
 		this.baseCoinLongField = 'BaseCurrencyLong'
