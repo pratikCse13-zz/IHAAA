@@ -6,6 +6,7 @@ var ncc = require('console.io-client')
 require('babel-polyfill')
 var dateFormat = require('dateFormat')
 var childProcess = require('child_process')
+var Bull = require('bull')
 
 ncc.connect({
 	endpoint: "http://localhost:8080",
@@ -21,6 +22,9 @@ var redis = require('./redisSetup')
 var config = require('./config')
 
 module.exports = async function(){
+	//define queue for depth calculation
+	var depthCalculatorQueue = new Bull('opportunity depth calculating queue')
+	depthCalculatorQueue.process(config.parallelDepthCalculators, __dirname+'/opportunityDepthCalculator.js')
 	try {
 		var keys = await redis.keysAsync('*|*/*')
 		var multi = redis.multi()
@@ -90,8 +94,12 @@ module.exports = async function(){
 					// marketLogged = true;
 					// console.log(`${initialMarket.exchange} to ${finalMarket.exchange} : ${gain} %`)
 					// console.log(`askPrice: ${initialMarket.askPrice} -- bidPrice: ${finalMarket.bidPrice}`)
-					var worker = childProcess.fork('./compiled/depthCalculator')
-					worker.send({
+					// var worker = childProcess.fork('./compiled/depthCalculator')
+					// worker.send({
+					// 	initialMarket: initialMarket,
+					// 	finalMarket: finalMarket
+					// })
+					depthCalculatorQueue.add({
 						initialMarket: initialMarket,
 						finalMarket: finalMarket
 					})

@@ -26,6 +26,7 @@
   "dependencies": {
     "bluebird": "^3.5.1",
     "body-parser": "^1.18.2",
+    "bull": "^3.3.10",
     "console.io-client": "0.0.4",
     "dateformat": "^3.0.3",
     "express": "^4.16.2",

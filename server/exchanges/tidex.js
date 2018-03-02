@@ -12,6 +12,7 @@ var fs = require('fs')
 var Feed = require('../feed')
 var helpers = require('../helpers')
 var constants = require('../constants')
+const config = require('../config')
 var redis = require('../redisSetup')
 var redisKeyPersist = require('./redisKeyPersistanceSetup')
 var coinPersist = require('./coinInfoPersistanceSetup')
@@ -46,7 +47,7 @@ class Tidex {
 		this.quantityKey = '1'
 		this.rateKey = '0'
 		this.parameterField = 'id'
-		this.orderBookApi = 'https://api.tidex.com/api/3/depth/||?limit=20'
+		this.orderBookApi = 'https://api.tidex.com/api/3/depth/||?limit='+config.orderBookDepth
 		
 		//not available
 		this.market = 'display_name'

@@ -4,6 +4,7 @@
 var request = require('request-promise')
 require('babel-polyfill')
 var _ = require('lodash')
+var bull = require('bull')
 
 /**
  * import package modules

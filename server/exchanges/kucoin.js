@@ -13,6 +13,7 @@ var ExchangeType2 = require('../exchangeTypes/exchangeType2.js')
 var Feed = require('../feed')
 var helpers = require('../helpers')
 var constants = require('../constants')
+const config = require('../config')
 var redis = require('../redisSetup')
 var coinPersist = require('./coinInfoPersistanceSetup')
 
@@ -53,7 +54,7 @@ class Kucoin extends ExchangeType2{
 		this.quantityKey = '1'
 		this.rateKey = '0'
 		this.parameterField = 'symbol'
-		this.orderBookApi = 'https://api.kucoin.com/v1/||/open/orders?limit=20'
+		this.orderBookApi = 'https://api.kucoin.com/v1/||/open/orders?limit='+config.orderBookDepth
 
 		//not available
 		this.dollarVolumeField = 'Volume';

@@ -13,6 +13,7 @@ var Feed = require('../feed')
 var helpers = require('../helpers')
 var constants = require('../constants')
 var redis = require('../redisSetup')
+const config = require('../config')
 var redisKeyPersist = require('./redisKeyPersistanceSetup')
 var coinPersist = require('./coinInfoPersistanceSetup')
 
@@ -52,7 +53,7 @@ class Cex {
 		this.quantityKey = '1'
 		this.rateKey = '0'
 		this.parameterField = 'id'
-		this.orderBookApi = 'https://cex.io/api/order_book/||/?depth=20'
+		this.orderBookApi = 'https://cex.io/api/order_book/||/?depth='+config.orderBookDepth
 		
 		//not available
         this.marketIsActive = 'status'
