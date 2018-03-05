@@ -12,13 +12,14 @@ var fs = require('fs')
 var Feed = require('../feed')
 var helpers = require('../helpers')
 var constants = require('../constants')
+const config = require('../config')
 var redis = require('../redisSetup')
 var redisKeyPersist = require('./redisKeyPersistanceSetup')
 var coinPersist = require('./coinInfoPersistanceSetup')
 
-class Gdax { 
+class Bleutrade { 
 	constructor(){
-		this.exchange = 'gdax'
+		this.exchange = 'bleuTrade'
 		this.filePath = __dirname
 		this.redisKeyPersist = redisKeyPersist(constants.STRINGS.bitfinex)
 		this.coinPersist = coinPersist(constants.STRINGS.bitfinex)
@@ -27,21 +28,20 @@ class Gdax {
 		this.depositFee = 0
 
 		this.market = 'display_name'
-		this.marketCoin = 'base_currency'
-		this.marketCoinLong = 'base_currency'
-		this.baseCoin = 'quote_currency'
-		this.baseCoinLong = 'quote_currency'
-		this.marketIsActive = 'status'
-		this.notice = 'status_message'
-		this.marketsApiResultSubKey = ''
-		this.marketsApi = 'https://api.gdax.com/products'
+		this.marketCoin = 'MarketCurrency'
+		this.marketCoinLong = 'MarketCurrencyLong'
+		this.baseCoin = 'BaseCurrency'
+		this.baseCoinLong = 'BaseCurrencyLong'
+		this.marketIsActive = 'IsActive'
+		this.marketsApiResultSubKey = 'result'
+		this.marketsApi = 'https://bleutrade.com/api/v2/public/getmarkets'
 		
-		this.lastPrice = 'price'
+		this.lastPrice = 'Last'
 		this.btcVolume = 'volume'
-		this.bidPrice = 'bid'
-		this.askPrice = 'ask'
-		this.tickerApiResultSubKey = ''		
-		this.tickerApi = 'https://api.gdax.com/products/||/ticker'
+		this.bidPrice = 'Bid'
+		this.askPrice = 'Ask'
+		this.tickerApiResultSubKey = 'result'		
+		this.tickerApi = 'https://bleutrade.com/api/v2/public/getticker?market=||'
 		
 		this.marketCoinApi2Field = 'id'
 		this.coinWithdrawActiveField = 'status'
@@ -49,14 +49,15 @@ class Gdax {
 		this.api3ResultSubKey = ''
         this.coinsApi = 'https://api.gdax.com/currencies'
         
-        this.buyKey = 'bids'
-		this.sellKey = 'asks'
-		this.quantityKey = '1'
-		this.rateKey = '0'
-		this.parameterField = 'id'
-		this.orderBookApi = 'https://api.gdax.com/products/||/book?limit=20'
+        this.buyKey = 'result.buy'
+		this.sellKey = 'result.sell'
+		this.quantityKey = 'Quantity'
+		this.rateKey = 'Rate'
+		this.parameterField = 'MarketName'
+		this.orderBookApi = 'https://bleutrade.com/api/v2/public/getorderbook?market=||&depth='+config.orderBookDepth
 		
 		//not available
+		this.notice = 'status_message'
 		this.withdrawFeeField = 'TxFee'
 	}
 
@@ -76,7 +77,8 @@ class Gdax {
 			}
 		}
 		try {
-			var markets = await request.get(options)
+            var markets = await request.get(options)
+            markets = markets.result
 		} catch(err) {
 			return helpers.handleError(err, 'fetching markets', `${this.exchange}`)
 		}
@@ -85,14 +87,15 @@ class Gdax {
 			markets.forEach(async (market)=>{
 				//get market ticker
 				var options = {
-					uri: this.tickerApi.replace(/\|\|/g, market.id),
+					uri: this.tickerApi.replace(/\|\|/g, market.MarketName),
 					json: true,
 					headers: {
 						'User-Agent': 'ihaaaBackend'
 					}
 				}
 				try {
-					var ticker = await request.get(options)
+                    var ticker = await request.get(options)
+                    ticker = ticker.result
 				} catch(err) {
 					return helpers.handleError(err, 'fetching market tickers', `${this.exchange}`)
 				}
@@ -129,8 +132,6 @@ class Gdax {
 					if(!global[this.exchange+'BaseCoins']){
 						global[this.exchange+'BaseCoins'] = []	
 					} else {
-						console.log("global[this.exchange+'BaseCoins']")
-						console.log(global[this.exchange+'BaseCoins'])
 						if(global[this.exchange+'BaseCoins'].indexOf(marketCoin) != -1 && baseCoin == constants.STRINGS.bitcoinShortNotation){ //needs dictionary
 							global[this.exchange+'-'+marketCoin] = lastPrice
 						}
@@ -157,7 +158,7 @@ class Gdax {
 						'marketCoinLong', marketCoinLong, 
 						'baseCoinLong', baseCoinLong,
 						'market', marketName,
-						'marketIsActive', helpers.getMarketIsActive(market[this.marketIsActive]),
+						'marketIsActive', marketIsActive,
 						'buyKey', this.buyKey,
 						'sellKey', this.sellKey,
 						'quantityKey', this.quantityKey,
@@ -184,4 +185,4 @@ class Gdax {
 	}
 }
 
-module.exports = Gdax
+module.exports = Bleutrade

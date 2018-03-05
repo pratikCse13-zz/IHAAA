@@ -7,7 +7,9 @@ module.exports = {
 		tidex: 'tidex',
 		cex: 'cex',
 		gdax: 'gdax',
+		hitBtc: 'hitBtc',
 		coinExchange: 'coinExchange',
+		liqui: 'liqui',
 		bitcoinShortNotation: 'btc'
 	},
 	coinDeskGetBitcoinStatsApi: 'https://api.coindesk.com/v1/bpi/currentprice.json',

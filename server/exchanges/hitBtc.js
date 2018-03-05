@@ -12,36 +12,33 @@ var fs = require('fs')
 var Feed = require('../feed')
 var helpers = require('../helpers')
 var constants = require('../constants')
+const config = require('../config')
 var redis = require('../redisSetup')
 var redisKeyPersist = require('./redisKeyPersistanceSetup')
 var coinPersist = require('./coinInfoPersistanceSetup')
 
-class Gdax { 
+class Hitbtc {
 	constructor(){
-		this.exchange = 'gdax'
+		this.exchange = 'hitBtc'
 		this.filePath = __dirname
-		this.redisKeyPersist = redisKeyPersist(constants.STRINGS.bitfinex)
-		this.coinPersist = coinPersist(constants.STRINGS.bitfinex)
+		this.redisKeyPersist = redisKeyPersist(constants.STRINGS.hitBtc)
+		this.coinPersist = coinPersist(constants.STRINGS.tidex)
 		this.txMakerFee = 0.0025
 		this.txTakerFee = 0.0025
 		this.depositFee = 0
 
-		this.market = 'display_name'
-		this.marketCoin = 'base_currency'
-		this.marketCoinLong = 'base_currency'
-		this.baseCoin = 'quote_currency'
-		this.baseCoinLong = 'quote_currency'
-		this.marketIsActive = 'status'
-		this.notice = 'status_message'
-		this.marketsApiResultSubKey = ''
-		this.marketsApi = 'https://api.gdax.com/products'
+		this.marketCoin = 'commodity'
+		this.marketCoinLong = 'commodity'
+		this.baseCoin = 'currency'
+        this.baseCoinLong = 'currency'
+        this.marketsApi = 'https://api.hitbtc.com/api/1/public/symbols'
 		
-		this.lastPrice = 'price'
+		this.lastPrice = 'last'
 		this.btcVolume = 'volume'
-		this.bidPrice = 'bid'
+		this.bidPrice = 'bud'
 		this.askPrice = 'ask'
-		this.tickerApiResultSubKey = ''		
-		this.tickerApi = 'https://api.gdax.com/products/||/ticker'
+		this.ticketApiResultSubKey = 'pairs'		
+		this.tickerApi = 'https://api.hitbtc.com/api/1/public/ticker'
 		
 		this.marketCoinApi2Field = 'id'
 		this.coinWithdrawActiveField = 'status'
@@ -53,10 +50,14 @@ class Gdax {
 		this.sellKey = 'asks'
 		this.quantityKey = '1'
 		this.rateKey = '0'
-		this.parameterField = 'id'
-		this.orderBookApi = 'https://api.gdax.com/products/||/book?limit=20'
+		this.parameterField = 'symbol'
+		this.orderBookApi = 'https://api.hitbtc.com/api/1/public/||/orderbook'
 		
 		//not available
+		this.market = 'display_name'
+		this.marketIsActive = 'status'
+		this.notice = 'status_message'
+		this.marketsApiResultSubKey = 'pairs'
 		this.withdrawFeeField = 'TxFee'
 	}
 
@@ -68,35 +69,34 @@ class Gdax {
 		console.log(`Refreshing ${this.exchange}'s markets.`)
 		console.time(`${this.exchange}'s Markets`)
 		//fetch all the markets
-		var options = {
+		var getMarkets = {
 			uri: this.marketsApi,
 			json: true,
 			headers: {
 				'User-Agent': 'ihaaaBackend'
 			}
-		}
+        }
+        //fetch the tickers
+        var getTickers = {
+			uri: this.tickerApi,
+			json: true,
+			headers: {
+				'User-Agent': 'ihaaaBackend'
+			}
+        }
 		try {
-			var markets = await request.get(options)
+            var [markets, tickers] = await Promise.all([
+                request.get(getMarkets),
+                request.get(getTickers)
+            ])
+            markets = markets.symbols
 		} catch(err) {
-			return helpers.handleError(err, 'fetching markets', `${this.exchange}`)
+			return helpers.handleError(err, 'fetching markets or tickers', `${this.exchange}`)
 		}
-		//then for each market fetch the ticket 
 		if(markets){
 			markets.forEach(async (market)=>{
 				//get market ticker
-				var options = {
-					uri: this.tickerApi.replace(/\|\|/g, market.id),
-					json: true,
-					headers: {
-						'User-Agent': 'ihaaaBackend'
-					}
-				}
-				try {
-					var ticker = await request.get(options)
-				} catch(err) {
-					return helpers.handleError(err, 'fetching market tickers', `${this.exchange}`)
-				}
-
+				var ticker = tickers[market.symbol]
 				//timestamp 
 				var timestamp = helpers.getTimestamp()
 				//get formatted market name
@@ -112,7 +112,7 @@ class Gdax {
 				//market coin
 				var marketCoin = helpers.getMarketCurrency(market[this.marketCoin])
 				//market is active
-				var marketIsActive = helpers.getMarketIsActive(market[this.marketIsActive])
+				var marketIsActive = true
 				//askPrice
 				var askPrice = helpers.getFormattedPrice(ticker[this.askPrice])
 				//bidPrice
@@ -129,8 +129,6 @@ class Gdax {
 					if(!global[this.exchange+'BaseCoins']){
 						global[this.exchange+'BaseCoins'] = []	
 					} else {
-						console.log("global[this.exchange+'BaseCoins']")
-						console.log(global[this.exchange+'BaseCoins'])
 						if(global[this.exchange+'BaseCoins'].indexOf(marketCoin) != -1 && baseCoin == constants.STRINGS.bitcoinShortNotation){ //needs dictionary
 							global[this.exchange+'-'+marketCoin] = lastPrice
 						}
@@ -184,4 +182,4 @@ class Gdax {
 	}
 }
 
-module.exports = Gdax
+module.exports = Hitbtc

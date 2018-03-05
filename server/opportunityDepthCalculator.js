@@ -100,15 +100,16 @@ module.exports = (job)=>{
                             var percentGain = (totalGainInBaseCoin/totalBuyPrice)*100
                             percentGain = percentGain.toFixed(2)
                             if(totalGainInDollars >= config.thresholdGainInDollars){
-                                console.log('\n')                                
-                                console.log(`Market: ${finalMarket.market} | (${finalMarket.timestamp})`)
-                                console.log(`Buy at: ${initialMarket.exchange}`)
-                                console.log(`Best Ask Price: ${parseFloat(initialMarket.askPrice).toFixed(8)}`)
-                                console.log(`Sell at: ${finalMarket.exchange}`)
-                                console.log(`Best Bid Price: ${parseFloat(finalMarket.bidPrice).toFixed(8)}`)
-                                console.log(`total coins to invest: ${totalBuyPrice.toFixed(8)} ${finalMarket.baseCoin}`)
-                                console.log(`gain: ${totalGainInDollars}$ / ${totalGainInBaseCoin}${initialMarket.baseCoin} / ${percentGain}%`)
-                                console.log('\n')
+                                var feed = `\nMarket: ${finalMarket.market} | (${finalMarket.timestamp})`+
+                                            `\nBuy at: ${initialMarket.exchange}`+ 
+                                            `\nBest Ask Price: ${parseFloat(initialMarket.askPrice).toFixed(8)}`+   
+                                            `\nSell at: ${finalMarket.exchange}`+
+                                            `\nBest Bid Price: ${parseFloat(finalMarket.bidPrice).toFixed(8)}`+
+                                            `\ntotal base coins to invest: ${totalBuyPrice.toFixed(8)} ${finalMarket.baseCoin}`+
+                                            `\ntotal market coins bought: ${amountToInvest.toFixed(8)} ${finalMarket.marketCoin}`+
+                                            `\ngain: ${totalGainInDollars}$ / ${totalGainInBaseCoin}${initialMarket.baseCoin} / ${percentGain}%`+
+                                            `\n`
+                                console.log(feed)
                                 return Promise.resolve()
                             }
                         })

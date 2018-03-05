@@ -16,25 +16,25 @@ var redis = require('../redisSetup')
 var redisKeyPersist = require('./redisKeyPersistanceSetup')
 var coinPersist = require('./coinInfoPersistanceSetup')
 
-class Gdax { 
+class Bigone { 
 	constructor(){
-		this.exchange = 'gdax'
+		this.exchange = 'bigOne'
 		this.filePath = __dirname
-		this.redisKeyPersist = redisKeyPersist(constants.STRINGS.bitfinex)
-		this.coinPersist = coinPersist(constants.STRINGS.bitfinex)
+		this.redisKeyPersist = redisKeyPersist(constants.STRINGS.bigOne)
+		this.coinPersist = coinPersist(constants.STRINGS.bigOne)
 		this.txMakerFee = 0.0025
 		this.txTakerFee = 0.0025
 		this.depositFee = 0
 
 		this.market = 'display_name'
-		this.marketCoin = 'base_currency'
-		this.marketCoinLong = 'base_currency'
-		this.baseCoin = 'quote_currency'
-		this.baseCoinLong = 'quote_currency'
+		this.marketCoin = 'quote'
+		this.marketCoinLong = 'quote_name'
+		this.baseCoin = 'base'
+		this.baseCoinLong = 'base_name'
 		this.marketIsActive = 'status'
 		this.notice = 'status_message'
-		this.marketsApiResultSubKey = ''
-		this.marketsApi = 'https://api.gdax.com/products'
+		this.marketsApiResultSubKey = 'data'
+		this.marketsApi = 'https://api.big.one/markets'
 		
 		this.lastPrice = 'price'
 		this.btcVolume = 'volume'
@@ -184,4 +184,4 @@ class Gdax {
 	}
 }
 
-module.exports = Gdax
+module.exports = Bigone

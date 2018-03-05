@@ -16,9 +16,9 @@ var redis = require('../redisSetup')
 var redisKeyPersist = require('./redisKeyPersistanceSetup')
 var coinPersist = require('./coinInfoPersistanceSetup')
 
-class Gdax { 
+class Lykke { 
 	constructor(){
-		this.exchange = 'gdax'
+		this.exchange = 'lykke'
 		this.filePath = __dirname
 		this.redisKeyPersist = redisKeyPersist(constants.STRINGS.bitfinex)
 		this.coinPersist = coinPersist(constants.STRINGS.bitfinex)
@@ -26,21 +26,13 @@ class Gdax {
 		this.txTakerFee = 0.0025
 		this.depositFee = 0
 
-		this.market = 'display_name'
-		this.marketCoin = 'base_currency'
-		this.marketCoinLong = 'base_currency'
-		this.baseCoin = 'quote_currency'
-		this.baseCoinLong = 'quote_currency'
-		this.marketIsActive = 'status'
 		this.notice = 'status_message'
-		this.marketsApiResultSubKey = ''
-		this.marketsApi = 'https://api.gdax.com/products'
-		
-		this.lastPrice = 'price'
-		this.btcVolume = 'volume'
 		this.bidPrice = 'bid'
 		this.askPrice = 'ask'
-		this.tickerApiResultSubKey = ''		
+		this.lastPrice = 'lastPrice'
+		this.btcVolume = 'volume24H'
+		this.tickerApi = 'https://public-api.lykke.com/api/Market'
+		
 		this.tickerApi = 'https://api.gdax.com/products/||/ticker'
 		
 		this.marketCoinApi2Field = 'id'
@@ -57,6 +49,14 @@ class Gdax {
 		this.orderBookApi = 'https://api.gdax.com/products/||/book?limit=20'
 		
 		//not available
+		this.market = 'display_name'
+		this.marketCoin = 'base_currency'
+		this.marketCoinLong = 'base_currency'
+		this.baseCoin = 'quote_currency'
+		this.baseCoinLong = 'quote_currency'
+		this.marketIsActive = 'status'
+		this.tickerApiResultSubKey = ''		
+		this.marketsApiResultSubKey = ''
 		this.withdrawFeeField = 'TxFee'
 	}
 
@@ -68,35 +68,21 @@ class Gdax {
 		console.log(`Refreshing ${this.exchange}'s markets.`)
 		console.time(`${this.exchange}'s Markets`)
 		//fetch all the markets
-		var options = {
-			uri: this.marketsApi,
+		var getTicker = {
+			uri: this.tickerApi,
 			json: true,
 			headers: {
 				'User-Agent': 'ihaaaBackend'
 			}
 		}
 		try {
-			var markets = await request.get(options)
+			var tickers = await request.get(getTicker)
 		} catch(err) {
 			return helpers.handleError(err, 'fetching markets', `${this.exchange}`)
 		}
 		//then for each market fetch the ticket 
-		if(markets){
-			markets.forEach(async (market)=>{
-				//get market ticker
-				var options = {
-					uri: this.tickerApi.replace(/\|\|/g, market.id),
-					json: true,
-					headers: {
-						'User-Agent': 'ihaaaBackend'
-					}
-				}
-				try {
-					var ticker = await request.get(options)
-				} catch(err) {
-					return helpers.handleError(err, 'fetching market tickers', `${this.exchange}`)
-				}
-
+		if(tickers){
+			tickers.forEach(async (ticker)=>{
 				//timestamp 
 				var timestamp = helpers.getTimestamp()
 				//get formatted market name
@@ -129,8 +115,6 @@ class Gdax {
 					if(!global[this.exchange+'BaseCoins']){
 						global[this.exchange+'BaseCoins'] = []	
 					} else {
-						console.log("global[this.exchange+'BaseCoins']")
-						console.log(global[this.exchange+'BaseCoins'])
 						if(global[this.exchange+'BaseCoins'].indexOf(marketCoin) != -1 && baseCoin == constants.STRINGS.bitcoinShortNotation){ //needs dictionary
 							global[this.exchange+'-'+marketCoin] = lastPrice
 						}
@@ -184,4 +168,4 @@ class Gdax {
 	}
 }
 
-module.exports = Gdax
+module.exports = Lykke

@@ -32,6 +32,10 @@ var Qryptos = new Exchanges.qryptos
 var Gdax = new Exchanges.gdax
 var Tidex = new Exchanges.tidex
 var Cex = new Exchanges.cex
+var Hitbtc = new Exchanges.hitBtc
+var Liqui = new Exchanges.liqui
+var Bleutrade = new Exchanges.bleuTrade
+var Wex = new Exchanges.wex
 // var Bitfinex = new Exchanges.bitfinex
 
 setInterval(() => {
@@ -43,6 +47,10 @@ setInterval(() => {
 	// Gdax.refreshFeeds()
 	Tidex.refreshFeeds()
 	Cex.refreshFeeds()
+	Hitbtc.refreshFeeds()
+	Liqui.refreshFeeds()
+	Bleutrade.refreshFeeds()
+	Wex.refreshFeeds()
 	//Quoinex.refreshMarkets()
 	//Qryptos.refreshMarkets()
 	algo();
